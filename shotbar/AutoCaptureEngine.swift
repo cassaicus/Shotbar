@@ -4,51 +4,151 @@ import AppKit
 import ScreenCaptureKit
 internal import Combine
 
+enum ArrowKey: UInt16, CaseIterable, Identifiable {
+    case left = 123
+    case right = 124
+    case down = 125
+    case up = 126
+
+    var id: Self { self }
+
+    var displayName: String {
+        switch self {
+        case .left: return "左 (Left)"
+        case .right: return "右 (Right)"
+        case .down: return "下 (Down)"
+        case .up: return "上 (Up)"
+        }
+    }
+}
+
 class AutoCaptureEngine: ObservableObject {
     @Published var isRunning = false
-    private var timer: Timer?
+    // Settings are now retrieved from UserDefaults
+
+    private var currentShotCount = 0
+    private var loopTask: Task<Void, Never>? // Timerの代わりにTaskを使用
+
+    // Settings accessors
+    private var arrowKey: UInt16 {
+        let val = UserDefaults.standard.object(forKey: "arrowKey") as? Int
+        return UInt16(val ?? 125) // Default to Down (125)
+    }
+
+    private var maxCount: Int {
+        let val = UserDefaults.standard.object(forKey: "maxCount") as? Int
+        return val ?? 50
+    }
+
+    private var initialDelay: Double {
+        let val = UserDefaults.standard.object(forKey: "initialDelay") as? Double
+        return val ?? 5.0
+    }
+
+    private var intervalDelay: Double {
+        let val = UserDefaults.standard.object(forKey: "intervalDelay") as? Double
+        return val ?? 1.0
+    }
+
+    private var saveFolderPath: String {
+        UserDefaults.standard.string(forKey: "saveFolderPath") ?? ""
+    }
+
+    private var filenamePrefix: String {
+        let val = UserDefaults.standard.string(forKey: "filenamePrefix") ?? ""
+        return val.isEmpty ? "capture" : val
+    }
+
+    private var playCompletionSound: Bool {
+        UserDefaults.standard.bool(forKey: "playCompletionSound")
+    }
 
     func start() {
-        // アクセシビリティ権限チェック（キー操作用）
-        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
-        let accessEnabled = AXIsProcessTrustedWithOptions(options as CFDictionary)
-
-        if !accessEnabled {
+        if !checkPermission() {
             print("アクセシビリティ権限が必要です")
             return
         }
 
+        currentShotCount = 0
         isRunning = true
-        // 1秒ごとに実行
-        timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            self?.performAction()
+
+        // Capture settings at start of run
+        let _initialDelay = self.initialDelay
+        let _intervalDelay = self.intervalDelay
+        let _maxCount = self.maxCount
+        let _arrowKey = self.arrowKey
+        let _playCompletionSound = self.playCompletionSound
+
+        loopTask?.cancel()
+        loopTask = Task {
+            // 1. 最初の待ち時間
+            if _initialDelay > 0 {
+                try? await Task.sleep(nanoseconds: UInt64(_initialDelay * 1_000_000_000))
+            }
+            if Task.isCancelled { return }
+
+            while !Task.isCancelled {
+                // 2. スクリーンショット撮影
+                await self.takeScreenshotSCK()
+                if Task.isCancelled { break }
+
+                // 3. キー操作
+                self.sendKeyPress(keyCode: _arrowKey)
+
+                // カウント処理
+                self.currentShotCount += 1
+                if self.currentShotCount >= _maxCount {
+                    if _playCompletionSound {
+                        NSSound.beep()
+                    }
+                    await MainActor.run { self.stop() }
+                    break
+                }
+
+                // 4. 繰り返しの待ち時間
+                if _intervalDelay > 0 {
+                    try? await Task.sleep(nanoseconds: UInt64(_intervalDelay * 1_000_000_000))
+                }
+            }
         }
     }
 
     func stop() {
         isRunning = false
-        timer?.invalidate()
-        timer = nil
+        loopTask?.cancel()
+        loopTask = nil
     }
 
-    private func performAction() {
-        // 1. カーソルキー（下矢印）を送信
-        sendKeyPress(keyCode: 125)
+    func takeSingleShot() {
+        if !checkPermission() {
+             print("アクセシビリティ権限が必要です")
+             return
+        }
 
-        // 2. 少し待ってからスクリーンショット
-        // ScreenCaptureKitは非同期なのでTaskで囲む
+        let _arrowKey = self.arrowKey
+
         Task {
-            // 0.1秒待機（画面スクロールの反映待ち）
-            try? await Task.sleep(nanoseconds: 100 * 1_000_000)
+            // 1. 1秒待機 (Single shot default wait)
+            try? await Task.sleep(nanoseconds: 1_000_000_000)
+
+            // 2. スクリーンショット撮影
             await self.takeScreenshotSCK()
+
+            // 3. キー操作
+            self.sendKeyPress(keyCode: _arrowKey)
         }
     }
 
-    private func sendKeyPress(keyCode: CGKeyCode) {
+    private func checkPermission() -> Bool {
+        let options = [kAXTrustedCheckOptionPrompt.takeUnretainedValue() as String: true]
+        return AXIsProcessTrustedWithOptions(options as CFDictionary)
+    }
+
+    private func sendKeyPress(keyCode: UInt16) {
         let source = CGEventSource(stateID: .hidSystemState)
-        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: true)
+        let keyDown = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(keyCode), keyDown: true)
         keyDown?.post(tap: .cghidEventTap)
-        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: keyCode, keyDown: false)
+        let keyUp = CGEvent(keyboardEventSource: source, virtualKey: CGKeyCode(keyCode), keyDown: false)
         keyUp?.post(tap: .cghidEventTap)
     }
 
@@ -85,13 +185,27 @@ class AutoCaptureEngine: ObservableObject {
         
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd_HHmmss"
-        let fileName = "capture_\(formatter.string(from: Date())).png"
+        let timestamp = formatter.string(from: Date())
+        let prefix = self.filenamePrefix
+        let fileName = "\(prefix)_\(timestamp).png"
+
+        // 保存フォルダの決定
+        let savePath = self.saveFolderPath
+        let destinationURL: URL
+        if !savePath.isEmpty {
+            destinationURL = URL(fileURLWithPath: savePath)
+        } else {
+            // デスクトップ
+            destinationURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
+        }
         
-        // デスクトップ等のパスを取得
-        let desktopURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
-        let fileURL = desktopURL.appendingPathComponent(fileName)
+        let fileURL = destinationURL.appendingPathComponent(fileName)
         
-        try? data.write(to: fileURL)
-        print("保存完了: \(fileName)")
+        do {
+            try data.write(to: fileURL)
+            print("保存完了: \(fileURL.path)")
+        } catch {
+            print("保存失敗: \(error)")
+        }
     }
 }

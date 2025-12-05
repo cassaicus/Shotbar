@@ -38,7 +38,7 @@ struct SettingsView: View {
                 HStack {
                     Text("最大撮影回数 (1-999):")
                     TextField("回数", value: $maxCount, formatter: NumberFormatter())
-                        .onChange(of: maxCount) { newValue in
+                        .onChange(of: maxCount) {oldValue, newValue in
                             if newValue < 1 { maxCount = 1 }
                             if newValue > 999 { maxCount = 999 }
                         }
