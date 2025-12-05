@@ -1,9 +1,6 @@
 //
 //  ContentView.swift
 //  shotbar
-//
-//  Created by ibis on 2025/12/05.
-//
 
 import SwiftUI
 

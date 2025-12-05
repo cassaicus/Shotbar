@@ -1,7 +1,7 @@
 import Foundation
 import CoreGraphics
 import AppKit
-import ScreenCaptureKit // 追加
+import ScreenCaptureKit
 internal import Combine
 
 class AutoCaptureEngine: ObservableObject {
