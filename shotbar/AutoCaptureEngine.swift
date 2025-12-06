@@ -29,6 +29,7 @@ class AutoCaptureEngine: ObservableObject {
     private var currentShotCount = 0
     private var loopTask: Task<Void, Never>? // Timerの代わりにTaskを使用
     private var currentSessionFolderPath: URL?
+    private var lastImageData: Data?
 
     // Settings accessors
     private var arrowKey: UInt16 {
@@ -68,6 +69,10 @@ class AutoCaptureEngine: ObservableObject {
         UserDefaults.standard.bool(forKey: "autoCreateFolder")
     }
 
+    private var detectDuplicate: Bool {
+        UserDefaults.standard.bool(forKey: "detectDuplicate")
+    }
+
     func start() {
         if !checkPermission() {
             print("アクセシビリティ権限が必要です")
@@ -77,6 +82,7 @@ class AutoCaptureEngine: ObservableObject {
         currentShotCount = 0
         isRunning = true
         currentSessionFolderPath = nil
+        lastImageData = nil
 
         // Capture settings at start of run
         let _initialDelay = self.initialDelay
@@ -201,8 +207,28 @@ class AutoCaptureEngine: ObservableObject {
             // 画像を取得 (macOS 14.0+)
             let cgImage = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration)
             
-            // 保存処理
-            saveImage(cgImage)
+            // 重複チェック
+            if self.detectDuplicate {
+                let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
+                guard let currentData = bitmapRep.representation(using: .png, properties: [:]) else {
+                    saveImage(cgImage)
+                    return
+                }
+
+                if let lastData = lastImageData, lastData == currentData {
+                    print("重複画像を検知しました。停止します。")
+                    if self.playCompletionSound {
+                        NSSound.beep()
+                    }
+                    self.stop()
+                    return
+                }
+
+                lastImageData = currentData
+                saveImageData(currentData)
+            } else {
+                saveImage(cgImage)
+            }
             
         } catch {
             print("スクリーンショット撮影エラー: \(error)")
@@ -212,7 +238,10 @@ class AutoCaptureEngine: ObservableObject {
     private func saveImage(_ cgImage: CGImage) {
         let bitmapRep = NSBitmapImageRep(cgImage: cgImage)
         guard let data = bitmapRep.representation(using: .png, properties: [:]) else { return }
-        
+        saveImageData(data)
+    }
+
+    private func saveImageData(_ data: Data) {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyyMMdd_HHmmss"
         let timestamp = formatter.string(from: Date())

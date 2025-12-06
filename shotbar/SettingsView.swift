@@ -8,6 +8,7 @@ struct SettingsView: View {
     @AppStorage("maxCount") private var maxCount: Int = 50
     @AppStorage("initialDelay") private var initialDelay: Double = 5.0
     @AppStorage("intervalDelay") private var intervalDelay: Double = 1.0
+    @AppStorage("detectDuplicate") private var detectDuplicate: Bool = false
     @AppStorage("playCompletionSound") private var playCompletionSound: Bool = false
 
     var body: some View {
@@ -122,6 +123,16 @@ struct SettingsView: View {
                                 .multilineTextAlignment(.trailing)
                             Text("秒")
                         }
+                    }
+
+                    GridRow {
+                        Color.clear
+                            .gridColumnAlignment(.leading)
+                            .frame(width: 0, height: 0)
+
+                        Toggle("画像の重複を検知したら撮影を停止", isOn: $detectDuplicate)
+                            .toggleStyle(.checkbox)
+                            .help("直前に撮影した画像と完全に一致した場合、撮影を終了します")
                     }
                 }
                 .padding(8)
