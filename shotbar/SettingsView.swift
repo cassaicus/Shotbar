@@ -17,7 +17,7 @@ struct SettingsView: View {
                 Grid(alignment: .leading, verticalSpacing: 12) {
                     GridRow {
                         Label("保存先:", systemImage: "folder")
-                            .gridColumnAlignment(.trailing)
+                            .gridColumnAlignment(.leading)
                             .help("スクリーンショットの保存先フォルダ")
 
                         HStack {
@@ -44,7 +44,7 @@ struct SettingsView: View {
                     
                     GridRow {
                         Color.clear
-                            .gridColumnAlignment(.trailing)
+                            .gridColumnAlignment(.leading)
                             .frame(width: 0, height: 0)
 
                         Toggle("保存時に自動でフォルダを作成する", isOn: $autoCreateFolder)
@@ -60,6 +60,7 @@ struct SettingsView: View {
                     }
                 }
                 .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(maxWidth: .infinity)
 
@@ -68,7 +69,7 @@ struct SettingsView: View {
                 Grid(alignment: .leading, verticalSpacing: 12) {
                     GridRow {
                         Label("キー方向:", systemImage: "arrowkeys")
-                            .gridColumnAlignment(.trailing)
+                            .gridColumnAlignment(.leading)
                             .help("撮影後に送信されるキー入力")
 
                         Picker("", selection: $arrowKey) {
@@ -124,6 +125,7 @@ struct SettingsView: View {
                     }
                 }
                 .padding(8)
+                .frame(maxWidth: .infinity, alignment: .leading)
             }
             .frame(maxWidth: .infinity)
 
