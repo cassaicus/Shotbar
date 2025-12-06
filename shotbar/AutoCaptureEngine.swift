@@ -29,7 +29,7 @@ class AutoCaptureEngine: ObservableObject {
     private var currentShotCount = 0
     private var loopTask: Task<Void, Never>? // Timerの代わりにTaskを使用
     private var currentSessionFolderPath: URL?
-    private let duplicateDetector: DuplicateDetecting = ExactMatchDuplicateDetector()
+    private let duplicateDetector: DuplicateDetecting = VisionDuplicateDetector()
 
     // Settings accessors
     private var arrowKey: UInt16 {
@@ -73,6 +73,10 @@ class AutoCaptureEngine: ObservableObject {
         UserDefaults.standard.bool(forKey: "detectDuplicate")
     }
 
+    private var duplicateThreshold: Double {
+        UserDefaults.standard.object(forKey: "duplicateThreshold") as? Double ?? 0.05
+    }
+
     func start() {
         if !checkPermission() {
             print("アクセシビリティ権限が必要です")
@@ -82,7 +86,9 @@ class AutoCaptureEngine: ObservableObject {
         currentShotCount = 0
         isRunning = true
         currentSessionFolderPath = nil
+
         duplicateDetector.reset()
+        duplicateDetector.setThreshold(duplicateThreshold)
 
         // Capture settings at start of run
         let _initialDelay = self.initialDelay

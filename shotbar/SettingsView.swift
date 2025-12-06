@@ -9,6 +9,7 @@ struct SettingsView: View {
     @AppStorage("initialDelay") private var initialDelay: Double = 5.0
     @AppStorage("intervalDelay") private var intervalDelay: Double = 1.0
     @AppStorage("detectDuplicate") private var detectDuplicate: Bool = false
+    @AppStorage("duplicateThreshold") private var duplicateThreshold: Double = 0.05
     @AppStorage("playCompletionSound") private var playCompletionSound: Bool = false
 
     var body: some View {
@@ -133,11 +134,26 @@ struct SettingsView: View {
                         Label("停止条件:", systemImage: "stop.circle.fill")
                             .help("撮影ごとの待機時間")
                         
-                        
-                        HStack {
-                            Toggle("画像の重複を検知したら撮影を停止", isOn: $detectDuplicate)
-                                .toggleStyle(.checkbox)
-                                .help("直前に撮影した画像と完全に一致した場合、撮影を終了します")
+                        VStack(alignment: .leading) {
+                            HStack {
+                                Toggle("画像の重複を検知したら撮影を停止", isOn: $detectDuplicate)
+                                    .toggleStyle(.checkbox)
+                                    .help("直前に撮影した画像と類似している場合、撮影を終了します")
+                            }
+
+                            if detectDuplicate {
+                                HStack {
+                                    Text("判定の厳しさ:")
+                                        .font(.caption)
+                                    Slider(value: $duplicateThreshold, in: 0.0...0.5, step: 0.01)
+                                        .frame(width: 100)
+                                    Text("\(duplicateThreshold, specifier: "%.2f")")
+                                        .font(.caption)
+                                        .monospacedDigit()
+                                }
+                                .padding(.leading, 20)
+                                .help("値が小さいほど厳密に判定します (0.00 = 完全一致)。時計の秒数などを無視したい場合は数値を上げてください。")
+                            }
                         }
                     }
                 }
