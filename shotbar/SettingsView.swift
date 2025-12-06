@@ -10,57 +10,123 @@ struct SettingsView: View {
     @AppStorage("playCompletionSound") private var playCompletionSound: Bool = false
 
     var body: some View {
-        Form {
-            Section(header: Text("保存設定")) {
-                HStack {
-                    Text("保存先:")
-                    TextField("保存先フォルダ", text: $saveFolderPath)
-                        .disabled(true) // User should use the button
-                    Button("選択...") {
-                        selectFolder()
+        VStack(spacing: 20) {
+            // 保存設定セクション
+            GroupBox(label: Label("保存設定", systemImage: "folder.badge.gear")) {
+                Grid(alignment: .leading, verticalSpacing: 12) {
+                    GridRow {
+                        Label("保存先:", systemImage: "folder")
+                            .gridColumnAlignment(.trailing)
+                            .help("スクリーンショットの保存先フォルダ")
+
+                        HStack {
+                            Text(saveFolderPath.isEmpty ? "未選択 (デスクトップ)" : saveFolderPath)
+                                .lineLimit(1)
+                                .truncationMode(.middle)
+                                .foregroundColor(saveFolderPath.isEmpty ? .secondary : .primary)
+                                .help(saveFolderPath)
+                                .frame(maxWidth: .infinity, alignment: .leading)
+                                .padding(.vertical, 4)
+                                .padding(.horizontal, 8)
+                                .background(Color(NSColor.controlBackgroundColor))
+                                .cornerRadius(4)
+                                .overlay(
+                                    RoundedRectangle(cornerRadius: 4)
+                                        .stroke(Color(NSColor.separatorColor), lineWidth: 1)
+                                )
+
+                            Button("選択...") {
+                                selectFolder()
+                            }
+                        }
+                    }
+
+                    GridRow {
+                        Label("ファイル名接頭辞:", systemImage: "pencil")
+                            .help("保存されるファイルの先頭に付く文字列")
+
+                        TextField("例: capture", text: $filenamePrefix)
                     }
                 }
-
-                HStack {
-                    Text("ファイル名接頭辞:")
-                    TextField("例: capture", text: $filenamePrefix)
-                }
+                .padding(8)
             }
 
-            Section(header: Text("動作設定")) {
-                Picker("キー方向:", selection: $arrowKey) {
-                    Text("左 (Left)").tag(123)
-                    Text("右 (Right)").tag(124)
-                    Text("下 (Down)").tag(125)
-                    Text("上 (Up)").tag(126)
-                }
+            // 動作設定セクション
+            GroupBox(label: Label("動作設定", systemImage: "camera.badge.ellipsis")) {
+                Grid(alignment: .leading, verticalSpacing: 12) {
+                    GridRow {
+                        Label("キー方向:", systemImage: "arrowkeys")
+                            .gridColumnAlignment(.trailing)
+                            .help("撮影後に送信されるキー入力")
 
-                HStack {
-                    Text("最大撮影回数 (1-999):")
-                    TextField("回数", value: $maxCount, formatter: NumberFormatter())
-                        .onChange(of: maxCount) {oldValue, newValue in
+                        Picker("", selection: $arrowKey) {
+                            Text("左 (Left)").tag(123)
+                            Text("右 (Right)").tag(124)
+                            Text("下 (Down)").tag(125)
+                            Text("上 (Up)").tag(126)
+                        }
+                        .labelsHidden()
+                        .fixedSize()
+                    }
+
+                    GridRow {
+                        Label("最大撮影回数:", systemImage: "number")
+                            .help("自動撮影を行う最大回数")
+
+                        HStack {
+                            TextField("回数", value: $maxCount, formatter: NumberFormatter())
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                            Stepper("", value: $maxCount, in: 1...999)
+                                .labelsHidden()
+                            Text("回")
+                        }
+                        .onChange(of: maxCount) { oldValue, newValue in
                             if newValue < 1 { maxCount = 1 }
                             if newValue > 999 { maxCount = 999 }
                         }
-                }
+                    }
 
-                HStack {
-                    Text("開始までの待ち時間 (秒):")
-                    TextField("秒", value: $initialDelay, format: .number)
-                }
+                    GridRow {
+                        Label("開始待ち時間:", systemImage: "timer")
+                            .help("撮影開始までの待機時間")
 
-                HStack {
-                    Text("繰り返しの待ち時間 (秒):")
-                    TextField("秒", value: $intervalDelay, format: .number)
+                        HStack {
+                            TextField("秒", value: $initialDelay, format: .number)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                            Text("秒")
+                        }
+                    }
+
+                    GridRow {
+                        Label("撮影間隔:", systemImage: "clock.arrow.circlepath")
+                            .help("撮影ごとの待機時間")
+
+                        HStack {
+                            TextField("秒", value: $intervalDelay, format: .number)
+                                .frame(width: 80)
+                                .multilineTextAlignment(.trailing)
+                            Text("秒")
+                        }
+                    }
                 }
+                .padding(8)
             }
 
-            Section(header: Text("通知")) {
-                Toggle("完了時に音を鳴らす", isOn: $playCompletionSound)
+            // 通知セクション
+            GroupBox(label: Label("通知", systemImage: "bell.badge")) {
+                HStack {
+                    Toggle("完了時に音を鳴らす", isOn: $playCompletionSound)
+                        .toggleStyle(.checkbox)
+                    Spacer()
+                }
+                .padding(8)
             }
         }
         .padding()
-        .frame(width: 300, height: 350)
+        .frame(width: 480) // UI要素に合わせて少し広げる
+        .fixedSize(horizontal: true, vertical: true)
     }
 
     private func selectFolder() {
@@ -68,11 +134,20 @@ struct SettingsView: View {
         panel.canChooseFiles = false
         panel.canChooseDirectories = true
         panel.allowsMultipleSelection = false
+        panel.prompt = "選択"
+        panel.message = "保存先フォルダを選択してください"
 
         if panel.runModal() == .OK {
             if let url = panel.url {
                 saveFolderPath = url.path
             }
         }
+    }
+}
+
+// プレビュー用 (macOS環境でのみ有効)
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        SettingsView()
     }
 }
