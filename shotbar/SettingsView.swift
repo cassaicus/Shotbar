@@ -53,7 +53,7 @@ struct SettingsView: View {
                     }
                     
                     GridRow {
-                        Label("ファイル名接頭辞:", systemImage: "pencil")
+                        Label("ファイル名:", systemImage: "pencil")
                             .help("保存されるファイルの先頭に付く文字列")
 
                         TextField("例: capture", text: $filenamePrefix)
