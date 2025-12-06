@@ -142,14 +142,20 @@ struct SettingsView: View {
                             }
 
                             if detectDuplicate {
-                                HStack {
-                                    Text("判定の厳しさ:")
-                                        .font(.caption)
-                                    Slider(value: $duplicateThreshold, in: 0.0...0.5, step: 0.01)
-                                        .frame(width: 100)
-                                    Text("\(duplicateThreshold, specifier: "%.2f")")
-                                        .font(.caption)
-                                        .monospacedDigit()
+                                VStack(alignment: .leading, spacing: 2) {
+                                    HStack {
+                                        Text("判定の厳しさ:")
+                                            .font(.caption)
+                                        Slider(value: $duplicateThreshold, in: 0.0...0.5, step: 0.01)
+                                            .frame(width: 100)
+                                        Text("\(duplicateThreshold, specifier: "%.2f")")
+                                            .font(.caption)
+                                            .monospacedDigit()
+                                    }
+
+                                    Text("推薦値: 0.05 (0.00は完全一致)")
+                                        .font(.caption2)
+                                        .foregroundColor(.secondary)
                                 }
                                 .padding(.leading, 20)
                                 .help("値が小さいほど厳密に判定します (0.00 = 完全一致)。時計の秒数などを無視したい場合は数値を上げてください。")
