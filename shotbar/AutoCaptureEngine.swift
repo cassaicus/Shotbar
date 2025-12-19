@@ -14,10 +14,10 @@ enum ArrowKey: UInt16, CaseIterable, Identifiable {
 
     var displayName: String {
         switch self {
-        case .left: return "左 (Left)"
-        case .right: return "右 (Right)"
-        case .down: return "下 (Down)"
-        case .up: return "上 (Up)"
+        case .left: return "Left"
+        case .right: return "Right"
+        case .down: return "Down"
+        case .up: return "Up"
         }
     }
 }
@@ -25,9 +25,12 @@ enum ArrowKey: UInt16, CaseIterable, Identifiable {
 class AutoCaptureEngine: ObservableObject {
     @Published var isRunning = false
     // Settings are now retrieved from UserDefaults
+    // 設定は現在UserDefaultsから取得されます
 
     private var currentShotCount = 0
-    private var loopTask: Task<Void, Never>? // Timerの代わりにTaskを使用
+    private var loopTask: Task<Void, Never>?
+    // Use Task instead of Timer
+    // Timerの代わりにTaskを使用
     private var currentSessionFolderPath: URL?
     private let duplicateDetector: DuplicateDetecting = VisionDuplicateDetector()
 
@@ -100,7 +103,7 @@ class AutoCaptureEngine: ObservableObject {
 
     func start() {
         if !checkPermission() {
-            print("アクセシビリティ権限が必要です")
+            print("Access permission is required") // アクセシビリティ権限が必要です
             return
         }
 
@@ -112,6 +115,7 @@ class AutoCaptureEngine: ObservableObject {
         duplicateDetector.setThreshold(duplicateThreshold)
 
         // Capture settings at start of run
+        // 実行開始時に設定をキャプチャする
         let _initialDelay = self.initialDelay
         let _intervalDelay = self.intervalDelay
         let _maxCount = self.maxCount
@@ -143,9 +147,11 @@ class AutoCaptureEngine: ObservableObject {
 
         loopTask?.cancel()
         loopTask = Task {
+            // 1. Initial delay
             // 1. 最初の待ち時間
             if _initialDelay > 0 {
                 let delayInt = Int(_initialDelay)
+                // Play sound and wait for seconds
                 // 秒数分、音を鳴らして待機
                 for _ in 0..<delayInt {
                     if Task.isCancelled { return }
@@ -153,6 +159,7 @@ class AutoCaptureEngine: ObservableObject {
                     try? await Task.sleep(nanoseconds: 1_000_000_000)
                 }
 
+                // Sound at 0 seconds
                 // 0秒時点の音
                 if Task.isCancelled { return }
                 await MainActor.run { self.playCountdownSound() }
@@ -160,13 +167,16 @@ class AutoCaptureEngine: ObservableObject {
             if Task.isCancelled { return }
 
             while !Task.isCancelled {
+                // 2. Take screenshot
                 // 2. スクリーンショット撮影
                 await self.takeScreenshotSCK()
                 if Task.isCancelled { break }
 
+                // 3. Key operation
                 // 3. キー操作
                 self.sendKeyPress(keyCode: _arrowKey)
 
+                // Counting
                 // カウント処理
                 self.currentShotCount += 1
                 if self.currentShotCount >= _maxCount {
@@ -177,6 +187,7 @@ class AutoCaptureEngine: ObservableObject {
                     break
                 }
 
+                // 4. Interval delay
                 // 4. 繰り返しの待ち時間
                 if _intervalDelay > 0 {
                     try? await Task.sleep(nanoseconds: UInt64(_intervalDelay * 1_000_000_000))
@@ -194,19 +205,22 @@ class AutoCaptureEngine: ObservableObject {
 
     func takeSingleShot() {
         if !checkPermission() {
-             print("アクセシビリティ権限が必要です")
+             print("Access permission is required") // アクセシビリティ権限が必要です
              return
         }
 
         let _arrowKey = self.arrowKey
 
         Task {
+            // 1. Wait 1 second (Single shot default wait)
             // 1. 1秒待機 (Single shot default wait)
             try? await Task.sleep(nanoseconds: 1_000_000_000)
 
+            // 2. Take screenshot
             // 2. スクリーンショット撮影
             await self.takeScreenshotSCK()
 
+            // 3. Key operation
             // 3. キー操作
             self.sendKeyPress(keyCode: _arrowKey)
         }
@@ -225,31 +239,37 @@ class AutoCaptureEngine: ObservableObject {
         keyUp?.post(tap: .cghidEventTap)
     }
 
+    // New screenshot method using ScreenCaptureKit
     // ScreenCaptureKitを使用した新しいスクリーンショット撮影メソッド
     @MainActor
     private func takeScreenshotSCK() async {
         do {
+            // Get current display info
             // 現在のディスプレイ情報を取得
             let availableContent = try await SCShareableContent.current
             guard let display = availableContent.displays.first else { return }
 
+            // Filter settings (Capture entire display, no excluded apps)
             // フィルター設定（ディスプレイ全体を撮る、除外アプリなし）
             let filter = SCContentFilter(display: display, excludingApplications: [], exceptingWindows: [])
             
+            // Configuration (Resolution etc.)
             // 設定（解像度など）
             let configuration = SCStreamConfiguration()
             configuration.width = display.width
             configuration.height = display.height
             
+            // Capture image (macOS 14.0+)
             // 画像を取得 (macOS 14.0+)
             let cgImage = try await SCScreenshotManager.captureImage(contentFilter: filter, configuration: configuration)
             
+            // Check for duplicates
             // 重複チェック
             if self.detectDuplicate {
                 let isDuplicate = await duplicateDetector.isDuplicate(cgImage)
 
                 if isDuplicate {
-                    print("重複画像を検知しました。停止します。")
+                    print("Duplicate image detected. Stopping.") // 重複画像を検知しました。停止します。
                     await MainActor.run {
                         self.playCompletionSoundAction()
                         self.stop()
@@ -258,11 +278,12 @@ class AutoCaptureEngine: ObservableObject {
                 }
             }
 
+            // Save if not duplicate (or not checking)
             // 重複でない場合（またはチェックしない場合）は保存
             saveImage(cgImage)
             
         } catch {
-            print("スクリーンショット撮影エラー: \(error)")
+            print("Screenshot error: \(error)") // スクリーンショット撮影エラー
         }
     }
     
@@ -279,6 +300,7 @@ class AutoCaptureEngine: ObservableObject {
         let prefix = self.filenamePrefix
         let fileName = "\(prefix)_\(timestamp).png"
 
+        // Determine save folder
         // 保存フォルダの決定
         let destinationURL: URL
         if let sessionURL = currentSessionFolderPath {
@@ -288,6 +310,7 @@ class AutoCaptureEngine: ObservableObject {
             if !savePath.isEmpty {
                 destinationURL = URL(fileURLWithPath: savePath)
             } else {
+                // Desktop
                 // デスクトップ
                 destinationURL = FileManager.default.urls(for: .desktopDirectory, in: .userDomainMask).first!
             }
@@ -297,9 +320,9 @@ class AutoCaptureEngine: ObservableObject {
         
         do {
             try data.write(to: fileURL)
-            print("保存完了: \(fileURL.path)")
+            print("Save complete: \(fileURL.path)") // 保存完了
         } catch {
-            print("保存失敗: \(error)")
+            print("Save failed: \(error)") // 保存失敗
         }
     }
 }

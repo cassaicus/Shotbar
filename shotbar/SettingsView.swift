@@ -17,16 +17,17 @@ struct SettingsView: View {
     
     var body: some View {
         VStack(spacing: 20) {
+            // Save settings section
             // 保存設定セクション
-            GroupBox(label: Label("保存設定", systemImage: "folder.badge.gear")) {
+            GroupBox(label: Label("Save Settings", systemImage: "folder.badge.gear")) {
                 Grid(alignment: .leading, verticalSpacing: 12) {
                     GridRow {
-                        Label("保存先:", systemImage: "folder")
+                        Label("Save Destination:", systemImage: "folder")
                             .gridColumnAlignment(.leading)
-                            .help("スクリーンショットの保存先フォルダ")
+                            .help("Destination folder for screenshots")
                         
                         HStack {
-                            Text(saveFolderPath.isEmpty ? "未選択 (デスクトップ)" : saveFolderPath)
+                            Text(saveFolderPath.isEmpty ? "Not Selected (Desktop)" : saveFolderPath)
                                 .lineLimit(1)
                                 .truncationMode(.middle)
                                 .foregroundColor(saveFolderPath.isEmpty ? .secondary : .primary)
@@ -41,7 +42,7 @@ struct SettingsView: View {
                                         .stroke(Color(NSColor.separatorColor), lineWidth: 1)
                                 )
                             
-                            Button("選択...") {
+                            Button("Select...") {
                                 selectFolder()
                             }
                         }
@@ -52,16 +53,16 @@ struct SettingsView: View {
                             .gridColumnAlignment(.leading)
                             .frame(width: 0, height: 0)
                         
-                        Toggle("保存時に自動でフォルダを作成する", isOn: $autoCreateFolder)
+                        Toggle("Automatically create folder when saving", isOn: $autoCreateFolder)
                             .toggleStyle(.checkbox)
-                            .help("撮影開始時に日時名のフォルダを作成し、そこに保存します")
+                            .help("Create a folder with date/time name at start and save there")
                     }
                     
                     GridRow {
-                        Label("ファイル名:", systemImage: "pencil")
-                            .help("保存されるファイルの先頭に付く文字列")
+                        Label("Filename Prefix:", systemImage: "pencil")
+                            .help("String to be prefixed to the saved file")
                         
-                        TextField("例: capture", text: $filenamePrefix)
+                        TextField("Ex: capture", text: $filenamePrefix)
                     }
                 }
                 .padding(8)
@@ -69,35 +70,36 @@ struct SettingsView: View {
             }
             .frame(maxWidth: .infinity)
             
+            // Behavior settings section
             // 動作設定セクション
-            GroupBox(label: Label("動作設定", systemImage: "camera.badge.ellipsis")) {
+            GroupBox(label: Label("Behavior Settings", systemImage: "camera.badge.ellipsis")) {
                 Grid(alignment: .leading, verticalSpacing: 12) {
                     GridRow {
-                        Label("キー方向:", systemImage: "arrowkeys")
+                        Label("Key Direction:", systemImage: "arrowkeys")
                             .gridColumnAlignment(.leading)
-                            .help("撮影後に送信されるキー入力")
+                            .help("Key input sent after capture")
                         
                         Picker("", selection: $arrowKey) {
-                            Text("左 (Left)").tag(123)
-                            Text("右 (Right)").tag(124)
-                            Text("下 (Down)").tag(125)
-                            Text("上 (Up)").tag(126)
+                            Text("Left").tag(123)
+                            Text("Right").tag(124)
+                            Text("Down").tag(125)
+                            Text("Up").tag(126)
                         }
                         .labelsHidden()
                         .fixedSize()
                     }
                     
                     GridRow {
-                        Label("最大撮影回数:", systemImage: "number")
-                            .help("自動撮影を行う最大回数")
+                        Label("Max Shot Count:", systemImage: "number")
+                            .help("Maximum number of auto captures")
                         
                         HStack {
-                            TextField("回数", value: $maxCount, formatter: NumberFormatter())
+                            TextField("Count", value: $maxCount, formatter: NumberFormatter())
                                 .frame(width: 80)
                                 .multilineTextAlignment(.trailing)
                             Stepper("", value: $maxCount, in: 1...999)
                                 .labelsHidden()
-                            Text("回")
+                            Text("times")
                         }
                         .onChange(of: maxCount) { oldValue, newValue in
                             if newValue < 1 { maxCount = 1 }
@@ -106,14 +108,14 @@ struct SettingsView: View {
                     }
                     
                     GridRow {
-                        Label("開始待ち時間:", systemImage: "timer")
-                            .help("撮影開始までの待機時間")
+                        Label("Initial Delay:", systemImage: "timer")
+                            .help("Wait time before starting capture")
                         
                         HStack {
-                            TextField("秒", value: $initialDelay, format: .number)
+                            TextField("sec", value: $initialDelay, format: .number)
                                 .frame(width: 80)
                                 .multilineTextAlignment(.trailing)
-                            Text("秒 (最大10秒)")
+                            Text("sec (Max 10s)")
                         }
                         .onChange(of: initialDelay) { oldValue, newValue in
                             if newValue > 10.0 { initialDelay = 10.0 }
@@ -122,8 +124,8 @@ struct SettingsView: View {
                     }
                     
                     GridRow {
-                        Label("カウントダウン音:", systemImage: "speaker.wave.2")
-                            .help("開始待ち時間中に1秒ごとに鳴らす音")
+                        Label("Countdown Sound:", systemImage: "speaker.wave.2")
+                            .help("Sound played every second during initial delay")
                         
                         Picker("", selection: $countDownSound) {
                             ForEach(soundOptions, id: \.self) { sound in
@@ -135,32 +137,32 @@ struct SettingsView: View {
                     }
                     
                     GridRow {
-                        Label("撮影間隔:", systemImage: "clock.arrow.circlepath")
-                            .help("撮影ごとの待機時間")
+                        Label("Interval:", systemImage: "clock.arrow.circlepath")
+                            .help("Wait time between captures")
                         
                         HStack {
-                            TextField("秒", value: $intervalDelay, format: .number)
+                            TextField("sec", value: $intervalDelay, format: .number)
                                 .frame(width: 80)
                                 .multilineTextAlignment(.trailing)
-                            Text("秒")
+                            Text("sec")
                         }
                     }
                     
                     GridRow {
-                        Label("停止条件:", systemImage: "stop.circle.fill")
-                            .help("撮影ごとの待機時間")
+                        Label("Stop Condition:", systemImage: "stop.circle.fill")
+                            .help("Wait time between captures")
                             .gridCellAnchor(.topLeading)
                         
                         VStack(alignment: .leading, spacing: 2) {
-                            Toggle("画像の重複を検知したら撮影を停止", isOn: $detectDuplicate)
+                            Toggle("Stop capture if duplicate image is detected", isOn: $detectDuplicate)
                                 .toggleStyle(.checkbox)
-                                .help("直前に撮影した画像と類似している場合、撮影を終了します")
+                                .help("Ends capture if similar to the previously captured image")
                                 .fixedSize()
                             
                             if detectDuplicate {
                                 VStack(alignment: .leading, spacing: 2) {
                                     HStack {
-                                        Text("判定基準:")
+                                        Text("Threshold:")
                                             .font(.caption)
                                         Slider(value: $duplicateThreshold, in: 0.0...0.5, step: 0.01)
                                             .frame(width: 90)
@@ -169,12 +171,12 @@ struct SettingsView: View {
                                             .monospacedDigit()
                                     }
                                     
-                                    Text("推薦値: 0.25 (0.00は完全一致で停止)")
+                                    Text("Recommended: 0.25 (0.00 stops on exact match)")
                                         .font(.caption2)
                                         .foregroundColor(.secondary)
                                 }
                                 .padding(.leading, 20)
-                                .help("値が小さいほど厳密に判定します (0.00 = 完全一致)。時計の秒数などを無視したい場合は数値を上げてください。")
+                                .help("Smaller values mean stricter matching (0.00 = Exact match). Increase to ignore clock seconds etc.")
                             }
                         }
                     }
@@ -185,10 +187,11 @@ struct SettingsView: View {
             }
             .frame(maxWidth: .infinity)
             
+            // Notification section
             // 通知セクション
-            GroupBox(label: Label("通知", systemImage: "bell.badge")) {
+            GroupBox(label: Label("Notifications", systemImage: "bell.badge")) {
                 HStack {
-                    Label("完了時の音:", systemImage: "speaker.wave.2")
+                    Label("Completion Sound:", systemImage: "speaker.wave.2")
                     
                     Picker("", selection: $completionSound) {
                         ForEach(soundOptions, id: \.self) { sound in
@@ -215,8 +218,8 @@ struct SettingsView: View {
         panel.canChooseDirectories = true
         panel.canCreateDirectories = true
         panel.allowsMultipleSelection = false
-        panel.prompt = "選択"
-        panel.message = "保存先フォルダを選択してください"
+        panel.prompt = "Select"
+        panel.message = "Please select the destination folder"
         
         if panel.runModal() == .OK {
             if let url = panel.url {
@@ -226,6 +229,7 @@ struct SettingsView: View {
     }
 }
 
+// For preview (Valid only in macOS environment)
 // プレビュー用 (macOS環境でのみ有効)
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
