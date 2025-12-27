@@ -1,3 +1,8 @@
+Shotbar is a lightweight utility tool designed for taking quick, continuous screenshots from the macOS menu bar.
+
+Key Features: Menu bar-resident: Saves continuous full-screen screenshots. Capture function: After capturing, you can use the cursor keys to advance through the currently displayed application.
+
+
 Shotbar は、macOSのメニューバーから素早く、連続してスクリーンショットを撮影するために設計された軽量なユーティリティツールです。
 
 主な特徴
