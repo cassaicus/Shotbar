@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		01F8CB9A2EE3070700133455 /* shotbar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = shotbar.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		01F8CB9A2EE3070700133455 /* Shotbar.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Shotbar.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		01F8CB9B2EE3070700133455 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				01F8CB9A2EE3070700133455 /* shotbar.app */,
+				01F8CB9A2EE3070700133455 /* Shotbar.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -67,7 +67,7 @@
 			packageProductDependencies = (
 			);
 			productName = shotbar;
-			productReference = 01F8CB9A2EE3070700133455 /* shotbar.app */;
+			productReference = 01F8CB9A2EE3070700133455 /* Shotbar.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -268,7 +268,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cassaicus.shotbar;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Shotbar;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -301,7 +301,7 @@
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = com.cassaicus.shotbar;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = Shotbar;
 				REGISTER_APP_GROUPS = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
