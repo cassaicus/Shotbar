@@ -171,7 +171,7 @@ struct SettingsView: View {
                                             .monospacedDigit()
                                     }
                                     
-                                    Text("Recommended: 0.25 (0.00 stops on exact match)")
+                                    Text("Recommended: 0.35 (0.00 stops on exact match)")
                                         .font(.caption2)
                                         .foregroundColor(.secondary)
                                 }
