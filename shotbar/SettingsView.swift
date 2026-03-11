@@ -1,4 +1,6 @@
 import SwiftUI
+import AppKit
+import ApplicationServices
 
 struct SettingsView: View {
     @AppStorage("saveFolderPath") private var saveFolderPath: String = ""
@@ -12,6 +14,9 @@ struct SettingsView: View {
     @AppStorage("duplicateThreshold") private var duplicateThreshold: Double = 0.05
     @AppStorage("completionSound") private var completionSound: String = "None"
     @AppStorage("countDownSound") private var countDownSound: String = "Beep"
+    
+    @State private var isAccessibilityAuthorized: Bool = false
+    @State private var isScreenCaptureAuthorized: Bool = false
     
     private let soundOptions = ["Beep", "Tink", "Pop", "Ping", "Morse", "None"]
     
@@ -206,10 +211,74 @@ struct SettingsView: View {
                 .padding(8)
             }
             .frame(maxWidth: .infinity)
+
+            // Permissions section
+            // 権限設定セクション
+            GroupBox(label: Label("Permissions", systemImage: "lock.shield")) {
+                VStack(alignment: .leading, spacing: 12) {
+                    HStack {
+                        Label("Accessibility:", systemImage: "accessibility")
+                        Spacer()
+                        if isAccessibilityAuthorized {
+                            Label("Authorized", systemImage: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        } else {
+                            Label("Not Authorized", systemImage: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                        
+                        Button("Settings") {
+                            let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?Privacy_Accessibility")!
+                            NSWorkspace.shared.open(url)
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                    
+                    Divider()
+                    
+                    HStack {
+                        Label("Screen Capture:", systemImage: "record.circle")
+                        Spacer()
+                        if isScreenCaptureAuthorized {
+                            Label("Authorized", systemImage: "checkmark.circle.fill")
+                                .foregroundColor(.green)
+                        } else {
+                            Label("Not Authorized", systemImage: "xmark.circle.fill")
+                                .foregroundColor(.red)
+                        }
+                        
+                        Button("Settings") {
+                            // 画面収録権限をリクエスト / 設定画面を開く
+                            CGRequestScreenCaptureAccess()
+                            // 少し遅れてステータスを更新
+                            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                                checkPermissions()
+                            }
+                        }
+                        .buttonStyle(.bordered)
+                        .controlSize(.small)
+                    }
+                }
+                .padding(8)
+            }
+            .frame(maxWidth: .infinity)
         }
         .padding()
         .frame(width: 480) // UI要素に合わせて少し広げる
         .fixedSize(horizontal: true, vertical: true)
+        .onAppear {
+            checkPermissions()
+        }
+    }
+    
+    private func checkPermissions() {
+        isAccessibilityAuthorized = AXIsProcessTrusted()
+        if #available(macOS 11.0, *) {
+            isScreenCaptureAuthorized = CGPreflightScreenCaptureAccess()
+        } else {
+            isScreenCaptureAuthorized = false
+        }
     }
     
     private func selectFolder() {
