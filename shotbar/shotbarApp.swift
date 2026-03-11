@@ -13,6 +13,7 @@ struct shotbarApp: App {
         // 設定ウィンドウ
         Window("Settings", id: "settings") {
             SettingsView()
+                .environmentObject(engine)
         }
 
         // Menu bar

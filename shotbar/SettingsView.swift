@@ -15,6 +15,8 @@ struct SettingsView: View {
     @AppStorage("completionSound") private var completionSound: String = "None"
     @AppStorage("countDownSound") private var countDownSound: String = "Beep"
     
+    @EnvironmentObject var engine: AutoCaptureEngine
+    
     @State private var isAccessibilityAuthorized: Bool = false
     @State private var isScreenCaptureAuthorized: Bool = false
     
@@ -263,6 +265,41 @@ struct SettingsView: View {
                 .padding(8)
             }
             .frame(maxWidth: .infinity)
+
+            Divider()
+
+            // Control section
+            // 操作セクション
+            VStack(spacing: 12) {
+                Button(action: {
+                    if engine.isRunning {
+                        engine.stop()
+                    } else {
+                        engine.start()
+                    }
+                }) {
+                    HStack {
+                        Image(systemName: engine.isRunning ? "stop.fill" : "play.fill")
+                        Text(engine.isRunning ? "Stop Auto Capture" : "Start Auto Capture")
+                            .fontWeight(.semibold)
+                    }
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 8)
+                }
+                .buttonStyle(.borderedProminent)
+                .tint(engine.isRunning ? .red : .accentColor)
+                .controlSize(.large)
+                .keyboardShortcut("s", modifiers: .command)
+                .help(engine.isRunning ? "Stop automatic capture" : "Start automatic capture (Cmd+S)")
+                
+                if engine.isRunning {
+                    Text("Auto capture is running...")
+                        .font(.caption)
+                        .foregroundColor(.secondary)
+                        .transition(.opacity)
+                }
+            }
+            .padding(.top, 10)
         }
         .padding()
         .frame(width: 480) // UI要素に合わせて少し広げる
@@ -303,5 +340,6 @@ struct SettingsView: View {
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         SettingsView()
+            .environmentObject(AutoCaptureEngine())
     }
 }
