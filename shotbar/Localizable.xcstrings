@@ -54,7 +54,14 @@
       }
     },
     "Auto capture is running..." : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動キャプチャが実行中です..."
+          }
+        }
+      }
     },
     "AutoCapture" : {
       "comment" : "The title of the menu bar item that starts and stops the auto capture feature.",
@@ -625,7 +632,14 @@
       }
     },
     "Start automatic capture (Cmd+S)" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動キャプチャを開始する（Cmd+S）"
+          }
+        }
+      }
     },
     "Stop" : {
       "comment" : "The label of a button that stops auto capture.",
@@ -646,10 +660,24 @@
       }
     },
     "Stop Auto Capture" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動キャプチャを停止"
+          }
+        }
+      }
     },
     "Stop automatic capture" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "自動キャプチャを停止"
+          }
+        }
+      }
     },
     "Stop capture if duplicate image is detected" : {
       "localizations" : {
