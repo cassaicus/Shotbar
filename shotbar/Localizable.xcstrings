@@ -34,10 +34,24 @@
       }
     },
     "Accessibility:" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "アクセシビリティ"
+          }
+        }
+      }
     },
     "Authorized" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "承認済み"
+          }
+        }
+      }
     },
     "AutoCapture" : {
       "comment" : "The title of the menu bar item that starts and stops the auto capture feature.",
@@ -346,7 +360,14 @@
       }
     },
     "Not Authorized" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "未承認"
+          }
+        }
+      }
     },
     "Notifications" : {
       "localizations" : {
@@ -365,7 +386,14 @@
       }
     },
     "Permissions" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "パーミッション"
+          }
+        }
+      }
     },
     "Quit" : {
       "comment" : "A button that quits the app when pressed.",
@@ -450,7 +478,14 @@
       }
     },
     "Screen Capture:" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "スクリーンキャプチャ"
+          }
+        }
+      }
     },
     "sec" : {
       "localizations" : {
