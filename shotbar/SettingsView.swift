@@ -87,10 +87,10 @@ struct SettingsView: View {
                             .help("Key input sent after capture")
                         
                         Picker("", selection: $arrowKey) {
-                            Text("Left").tag(123)
-                            Text("Right").tag(124)
-                            Text("Down").tag(125)
-                            Text("Up").tag(126)
+                            Text("上").tag(126)
+                            Text("下").tag(125)
+                            Text("右").tag(124)
+                            Text("左").tag(123)
                         }
                         .labelsHidden()
                         .fixedSize()
@@ -118,15 +118,9 @@ struct SettingsView: View {
                         Label("Initial Delay:", systemImage: "timer")
                             .help("Wait time before starting capture")
                         
-                        HStack {
-                            TextField("sec", value: $initialDelay, format: .number)
-                                .frame(width: 80)
-                                .multilineTextAlignment(.trailing)
-                            Text("sec (Max 10s)")
-                        }
-                        .onChange(of: initialDelay) { oldValue, newValue in
-                            if newValue > 10.0 { initialDelay = 10.0 }
-                            if newValue < 0 { initialDelay = 0 }
+                        Stepper(value: $initialDelay, in: 0...10.0, step: 1) {
+                            Text("\(String(format: "%.1f", initialDelay))秒")
+                                .monospacedDigit()
                         }
                     }
                     
@@ -147,11 +141,9 @@ struct SettingsView: View {
                         Label("Interval:", systemImage: "clock.arrow.circlepath")
                             .help("Wait time between captures")
                         
-                        HStack {
-                            TextField("sec", value: $intervalDelay, format: .number)
-                                .frame(width: 80)
-                                .multilineTextAlignment(.trailing)
-                            Text("sec")
+                        Stepper(value: $intervalDelay, in: 1...10.0, step: 1) {
+                            Text("\(String(format: "%.1f", intervalDelay))秒")
+                                .monospacedDigit()
                         }
                     }
                     
