@@ -33,6 +33,9 @@
         }
       }
     },
+    "%@秒" : {
+
+    },
     "Accessibility:" : {
       "localizations" : {
         "ja" : {
@@ -194,20 +197,7 @@
       }
     },
     "Down" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Down"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "下"
-          }
-        }
-      }
+
     },
     "Ends capture if similar to the previously captured image" : {
       "localizations" : {
@@ -322,20 +312,7 @@
       }
     },
     "Left" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Left"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "左"
-          }
-        }
-      }
+
     },
     "Max Shot Count:" : {
       "localizations" : {
@@ -440,20 +417,7 @@
       }
     },
     "Right" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Right"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "右"
-          }
-        }
-      }
+
     },
     "Save Destination:" : {
       "localizations" : {
@@ -493,38 +457,6 @@
           "stringUnit" : {
             "state" : "translated",
             "value" : "スクリーンキャプチャ"
-          }
-        }
-      }
-    },
-    "sec" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sec"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "秒"
-          }
-        }
-      }
-    },
-    "sec (Max 10s)" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "sec (Max 10s)"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "秒 (最大10秒)"
           }
         }
       }
@@ -778,20 +710,7 @@
       }
     },
     "Up" : {
-      "localizations" : {
-        "en" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "Up"
-          }
-        },
-        "ja" : {
-          "stringUnit" : {
-            "state" : "translated",
-            "value" : "上"
-          }
-        }
-      }
+
     },
     "Wait time before starting capture" : {
       "localizations" : {

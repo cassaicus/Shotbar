@@ -87,13 +87,14 @@ struct SettingsView: View {
                             .help("Key input sent after capture")
                         
                         Picker("", selection: $arrowKey) {
-                            Text("上").tag(126)
-                            Text("下").tag(125)
-                            Text("右").tag(124)
-                            Text("左").tag(123)
+                            Text("Left").tag(123)
+                            Text("Up").tag(126)
+                            Text("Down").tag(125)
+                            Text("Right").tag(124)
                         }
                         .labelsHidden()
                         .fixedSize()
+                        .pickerStyle(.segmented)
                     }
                     
                     GridRow {
