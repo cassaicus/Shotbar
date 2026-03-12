@@ -33,8 +33,15 @@
         }
       }
     },
-    "%@秒" : {
-
+    "%@sec" : {
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "%@秒"
+          }
+        }
+      }
     },
     "Accessibility:" : {
       "localizations" : {
@@ -197,7 +204,14 @@
       }
     },
     "Down" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "下"
+          }
+        }
+      }
     },
     "Ends capture if similar to the previously captured image" : {
       "localizations" : {
@@ -312,7 +326,14 @@
       }
     },
     "Left" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "左"
+          }
+        }
+      }
     },
     "Max Shot Count:" : {
       "localizations" : {
@@ -417,7 +438,14 @@
       }
     },
     "Right" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "右"
+          }
+        }
+      }
     },
     "Save Destination:" : {
       "localizations" : {
@@ -710,7 +738,14 @@
       }
     },
     "Up" : {
-
+      "localizations" : {
+        "ja" : {
+          "stringUnit" : {
+            "state" : "translated",
+            "value" : "上"
+          }
+        }
+      }
     },
     "Wait time before starting capture" : {
       "localizations" : {

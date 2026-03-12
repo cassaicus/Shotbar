@@ -120,7 +120,7 @@ struct SettingsView: View {
                             .help("Wait time before starting capture")
                         
                         Stepper(value: $initialDelay, in: 0...10.0, step: 1) {
-                            Text("\(String(format: "%.1f", initialDelay))秒")
+                            Text("\(String(format: "%.1f", initialDelay))sec")
                                 .monospacedDigit()
                         }
                     }
@@ -143,7 +143,7 @@ struct SettingsView: View {
                             .help("Wait time between captures")
                         
                         Stepper(value: $intervalDelay, in: 1...10.0, step: 1) {
-                            Text("\(String(format: "%.1f", intervalDelay))秒")
+                            Text("\(String(format: "%.1f", intervalDelay))sec")
                                 .monospacedDigit()
                         }
                     }
